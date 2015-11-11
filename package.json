@@ -1,0 +1,57 @@
+{
+  "name": "react-tag-input",
+  "version": "1.0.3",
+  "description": "React tags is a fantastically simple tagging component for your React projects",
+  "main": "dist-modules/reactTags.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --port 8090",
+    "build": "webpack -p && ./node_modules/.bin/babel ./lib --out-dir dist-modules"
+  },
+  "keywords": [
+    "react",
+    "drag-drop",
+    "tags",
+    "tag input",
+    "react-component",
+    "autosuggest"
+  ],
+  "author": {
+    "name": "Prakhar Srivastav"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prakhar1989/react-tags.git"
+  },
+  "dependencies": {
+    "lodash": "^3.9.3"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0",
+    "react-dnd": "^2.0.2",
+    "react-dnd-html5-backend": "^2.0.0"
+  },
+  "devDependencies": {
+    "babel": "^5.3.3",
+    "babel-loader": "^5.1.2",
+    "react": "^0.14.0",
+    "react-dnd": "^2.0.2",
+    "react-dnd-html5-backend": "^2.0.0",
+    "react-dom": "^0.14.0",
+    "webpack": "^1.9.4",
+    "webpack-dev-server": "^1.8.2"
+  },
+  "gitHead": "a622bfe3c0a76a624ee8db23b2eefb65f48074c2",
+  "readme": "### React-Tags\n\n[![NPM](https://nodei.co/npm/react-tag-input.png?downloads=true)](https://www.npmjs.com/package/react-tag-input)\n\nReact tags is a simple tagging component ready to drop in your React projects. The component is inspired by GMail's *To* field in the compose window. \n\n### Features\n- Autocomplete based on a suggestion list\n- Keyboard friendly and mouse support\n- Reorder tags using drag and drop\n\n### Why\nBecause I was looking for an excuse to build a standalone component and publish it in the wild? To be honest, I needed a tagging component that provided the above features for my [React-Surveyman](http://github.com/prakhar1989/react-surveyman) project. Since I was unable to find one which met my requirements (and the fact that I generally enjoy re-inventing the wheel) this is what I came up with.\n\n\n### Demo\n![img](demo.gif)\n\nCheck it out [here](http://prakhar.me/react-tags/example)\n\n### Installation\nThe preferred way of using the component is via NPM\n\n```\nnpm install --save react-tag-input\n```\nIt is, however, also available to be used separately (`dist/ReactTags.min.js`). If you prefer this method remember to include [ReactDND](https://github.com/gaearon/react-dnd) as a dependancy. Refer to the [demo](http://prakhar.me/react-tags/example) to see how this works.\n\n### Usage\n\nHere's a sample implementation that initializes the component with a list of initial `tags` and `suggestions` list. Apart from this, there are multiple events, handlers for which need to be set. For more details, go through the [API](#Options).\n\n```javascript\nvar ReactTags = require('react-tag-input').WithContext;\n\nvar App = React.createClass({\n    getInitialState: function() {\n        return {\n            tags: [ {id: 1, text: \"Apples\"} ],\n            suggestions: [\"Banana\", \"Mango\", \"Pear\", \"Apricot\"]\n        }\n    },\n    handleDelete: function(i) {\n        var tags = this.state.tags;\n        tags.splice(i, 1);\n        this.setState({tags: tags});\n    },\n    handleAddition: function(tag) {\n        var tags = this.state.tags;\n        tags.push({\n            id: tags.length + 1,\n            text: tag\n        });\n        this.setState({tags: tags});\n    },\n    handleDrag: function(tag, currPos, newPos) {\n        var tags = this.state.tags;\n\n        // mutate array\n        tags.splice(currPos, 1);\n        tags.splice(newPos, 0, tag);\n\n        // re-render\n        this.setState({ tags: tags });\n    },\n    render: function() {\n        var tags = this.state.tags;\n        var suggestions = this.state.suggestions;\n        return (\n            <div>\n                <ReactTags tags={tags} \n                    suggestions={suggestions}\n                    handleDelete={this.handleDelete}\n                    handleAddition={this.handleAddition}\n                    handleDrag={this.handleDrag} />\n            </div>\n        )\n    }\n});\n\nReact.render(<App />, document.getElementById('app'));\n```\n\n**A note about `Contexts`**\nOne of the dependancies of this component is the [react-dnd](https://github.com/gaearon/react-dnd) library. Since the 1.0 version, the original author has changed the API and requires the application using any draggable components to have a top-level [backend](http://gaearon.github.io/react-dnd/docs-html5-backend.html) context. So if you're using this component in an existing Application that uses React-DND you will already have a backend defined, in which case, you should `require` the component *without* the context.\n\n```javascript\nvar { ReactTags } = require('react-tag-input').WithOutContext;\n```\nOtherwise, you can simply import along with the backend itself (as shown above). If you have ideas to make this API better, I'd [love to hear](https://github.com/prakhar1989/react-tags/issues/new).\n\n<a name=\"Options\"></a>\n### Options\n\n- [`tags`](#tagsOption)\n- [`suggestions`](#suggestionsOption)\n- [`placeholder`](#placeholderOption)\n- [`labelField`](#labelFieldOption)\n- [`handleAddition`](#handleAdditionOption)\n- [`handleDelete`](#handleDeleteOption)\n- [`handleDrag`](#handleDragOption)\n- [`autofocus`](#autofocus)\n- [`allowDeleteFromEmptyInput`](#allowDeleteFromEmptyInput)\n- [`handleInputChange`](#handleInputChange)\n\n<a name=\"tagsOption\"></a>\n##### tags (optional)\nAn array of tags that are displayed as pre-selected. Each tag should have an `id` and a `text` property which is used to display.\n\n```js\nvar tags =  [ {id: 1, text: \"Apples\"} ]\n```\n\n<a name=\"suggestionsOption\"></a>\n##### suggestions (optional)\nAn array of suggestions that are used as basis for showing suggestions. At the moment, this should be an array of strings. \n\n```js\nvar suggestions = [\"mango\", \"pineapple\", \"orange\", \"pear\"];\n```\n\n<a name=\"placeholderOption\"></a>\n##### placeholder (optional)\nThe placeholder shown for the input. Defaults to `Add new tag`.\n\n```\nvar placeholder = \"Add new country\"\n```\n\n<a name=\"labelFieldOption\"></a>\n##### labelField (optional)\nProvide an alternative `label` property for the tags. Defaults to `text`.\n\n```\n<ReactTags tags={tags} \n    suggestions={}\n    labelField={'name'}\n    handleDrag={} />\n```\nThis is useful if your data uses the `text` property for something else.\n\n\n<a name=\"handleAdditionOption\"></a>\n##### handleAddition (required)\nFunction called when the user wants to add a tag (either a click, a tab press or carriage return)\n\n```js\nfunction(tag) {\n    // add the tag to the tag list\n}\n```\n\n<a name=\"handleDeleteOption\"></a>\n##### handleDelete (required)\nFunction called when the user wants to delete a tag\n\n```js\nfunction(i) {\n    // delete the tag at index i \n}\n```\n\n<a name=\"handleDragOption\"></a>\n##### handleDrag (required)\nFunction called when the user drags a tag.\n\n```js\nfunction(tag, currPos, newPos) {\n    // remove tag from currPos and add in newPos\n}\n```\n<a name=\"autofocus\"></a>\n##### autofocus (optional)\nOptional boolean param to control whether the text-input should be autofocused on mount.\n\n```js\n<ReactTags\n    autofocus={false}\n    ...>        \n```\n\n<a name=\"allowDeleteFromEmptyInput\"></a>\n##### allowDeleteFromEmptyInput (optional)\nOptional boolean param to control whether tags should be deleted when the 'Delete' key is pressed in an empty Input Box.\n\n```js\n<ReactTags\n    allowDeleteFromEmptyInput={false}\n    ...>\n```\n\n<a name=\"handleInputChange\"></a>\n##### handleInputChange (optional)\nOptional event handler for input onChange\n\n```js\n<ReactTags\n    handleInputChange={this.handleInputChange}\n    ...>\n```\n    \n### Styling\n`<ReactTags>` does not come up with any styles. However, it is very easy to customize the look of the component the way you want it. The component provides the following classes with which you can style - \n\n- `ReactTags__tags`\n- `ReactTags__tagInput`\n- `ReactTags__selected`\n- `ReactTags__selected ReactTags__tag`\n- `ReactTags__selected ReactTags__remove`\n- `ReactTags__suggestions`\n\nAn example can be found in `/example/reactTags.css`.\n\n### Dev\nThe component is written in ES6 and uses [Webpack](http://webpack.github.io/) as its build tool. \n```\nnpm install \nnpm run dev\npython -m SimpleHTTPServer ### open in browser\n```\n\n### Contributing\nGot ideas on how to make this better? Open an issue! I'm yet to add tests so keep your PRs on hold :grinning:\n\n### Thanks\nThe autocomplete dropdown is inspired by Lea Verou's [awesomeplete](https://github.com/LeaVerou/awesomplete) library. The Drag and drop functionality is provided by Dan Abramov's insanely useful [ReactDND](https://github.com/gaearon/react-dnd) library.\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/prakhar1989/react-tags/issues"
+  },
+  "homepage": "https://github.com/prakhar1989/react-tags#readme",
+  "_id": "react-tag-input@1.0.3",
+  "_shasum": "a0e100f4d9a0bea6c8508c3abc743f68a58306c5",
+  "_from": "izziaraffaele/react-tags#fix-deps",
+  "_resolved": "git://github.com/izziaraffaele/react-tags.git#a622bfe3c0a76a624ee8db23b2eefb65f48074c2"
+}
